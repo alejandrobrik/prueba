@@ -30,23 +30,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Servicio de autenticación basado en la base de datos
-/*    @Bean
-    public UserDetailsService userDetailsService(UsuarioRepository usuarioRepository) {
-        return username -> {
-            Optional<Usuario> usuarioOpt = usuarioRepository.findByUsernameOrMail(username, username);
-            if (usuarioOpt.isEmpty()) {
-                throw new UsernameNotFoundException("Usuario no encontrado.");
-            }
-            Usuario usuario = usuarioOpt.get();
-            return User.withUsername(usuario.getUsername())
-                    .password(usuario.getPassword())
-                    .roles(usuario.getRoles().stream().map(rol -> rol.getNombre().replace("ROLE_", "")).toArray(String[]::new))
-                    .build();
-        };
-    }*/
-
-
 
     @Bean
     public UserDetailsService userDetailsService(UsuarioRepository usuarioRepository) {
