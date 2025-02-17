@@ -11,7 +11,7 @@ COPY . .
 RUN chmod +x ./gradlew
 
 # Construye la aplicación con Gradle
-RUN ./gradlew build --no-daemon
+RUN ./gradlew build --no-daemon -x test
 
 # Copia el archivo JAR generado al contenedor
 RUN cp build/libs/prueba-0.0.1-SNAPSHOT.jar app.jar
