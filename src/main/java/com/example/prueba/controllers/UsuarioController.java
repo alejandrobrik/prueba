@@ -70,6 +70,7 @@ public class UsuarioController {
             return ResponseEntity.ok(usuarioGuardado);
 
         } catch (RuntimeException e) {
+            System.out.println("Error: " + e.getCause());
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error en la validación: " + e.getMessage());
@@ -90,4 +91,26 @@ public class UsuarioController {
             return ResponseEntity.status(500).body("Error en la búsqueda: " + e.getMessage());
         }
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarUsuario(@PathVariable Integer id, @RequestBody Usuario usuarioActualizado) {
+        try {
+            Usuario usuario = usuarioService.actualizarUsuario(id, usuarioActualizado);
+            return ResponseEntity.ok(usuario);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body("Error: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarUsuario(@PathVariable Integer id) {
+        boolean eliminado = usuarioService.eliminarUsuario(id);
+        if (eliminado) {
+            return ResponseEntity.ok("Usuario eliminado correctamente (estado INACTIVO).");
+        } else {
+            return ResponseEntity.status(404).body("Usuario no encontrado.");
+        }
+    }
+
+
 }

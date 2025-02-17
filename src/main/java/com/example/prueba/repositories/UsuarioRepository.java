@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -28,4 +29,14 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
     // 🔹 Verificar si existe un usuario con una identificación específica
     boolean existsByPersonaIdentificacion(String identificacion);
+
+    //Buscar usuario por ID
+    Optional<Usuario> findById(Integer id);
+
+
+    List<Usuario> findByStatus(String status);
+
+
+
+
 }

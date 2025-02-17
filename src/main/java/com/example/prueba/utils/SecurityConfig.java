@@ -47,6 +47,7 @@ public class SecurityConfig {
     }*/
 
 
+
     @Bean
     public UserDetailsService userDetailsService(UsuarioRepository usuarioRepository) {
         return username -> {
@@ -57,8 +58,9 @@ public class SecurityConfig {
             Usuario usuario = usuarioOpt.get();
 
             // 🔹 Imprimir roles del usuario antes de autenticación
-/*            System.out.println("Usuario autenticado: " + usuario.getUsername());
-            System.out.println("Roles asignados: " + usuario.getRoles());*/
+            System.out.println("Usuario autenticado: " + usuario.getUsername());
+            System.out.println("Roles asignados: " + usuario.getRoles());
+
 
             // 🔹 FORZAR CARGA DE ROLES
             Hibernate.initialize(usuario.getRoles()); // 💡 IMPORTANTE: Esto inicializa la colección de roles
@@ -130,5 +132,5 @@ public class SecurityConfig {
     }
 
 }
-
 */
+

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.Normalizer;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
 
@@ -87,4 +88,147 @@ public class UsuarioService {
         primerApellido = Normalizer.normalize(primerApellido, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
         return primeraLetra + primerApellido + "@mail.com";
     }
+
+    public Usuario actualizarUsuario(Integer id, Usuario usuarioActualizado) {
+        Usuario usuarioExistente = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Validar si la persona ya existe en la base de datos
+        if (usuarioActualizado.getPersona() != null) {
+            Optional<Persona> personaExistenteOpt = personaRepository.findByIdentificacion(usuarioActualizado.getPersona().getIdentificacion());
+
+            Persona personaExistente = personaExistenteOpt.orElseGet(() -> personaRepository.save(usuarioActualizado.getPersona()));
+
+            usuarioExistente.setPersona(personaExistente);
+
+            // 🔹 Generar correo solo si la persona ha cambiado
+            if (!usuarioExistente.getMail().contains("@mail.com") ||
+                    !usuarioExistente.getPersona().getIdentificacion().equals(personaExistente.getIdentificacion())) {
+
+                String correoGenerado = generarCorreo(personaExistente.getNombres(), personaExistente.getApellidos());
+
+                // 🔹 Verificar si el correo ya existe y evitar duplicados
+                int contador = 0;
+                String correoFinal = correoGenerado;
+                while (usuarioRepository.existsByMail(correoFinal)) {
+                    contador++;
+                    correoFinal = correoGenerado.replace("@mail.com", contador + "@mail.com");
+                }
+
+                usuarioExistente.setMail(correoFinal);
+            }
+        }
+
+        // 🔹 Mantener `username` y `mail` si no se envían en la actualización
+        if (usuarioActualizado.getUsername() != null && !usuarioActualizado.getUsername().isEmpty()) {
+            usuarioExistente.setUsername(usuarioActualizado.getUsername());
+        }
+
+        if (usuarioActualizado.getMail() != null && !usuarioActualizado.getMail().isEmpty()) {
+            usuarioExistente.setMail(usuarioActualizado.getMail());
+        }
+
+        // 🔹 Mantener la contraseña actual si no se envía una nueva
+        if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().isEmpty()) {
+            usuarioExistente.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));
+        }
+
+        // 🔹 Mantener el estado del usuario si no se envía
+        if (usuarioActualizado.getStatus() != null) {
+            usuarioExistente.setStatus(usuarioActualizado.getStatus());
+        }
+
+        // 🔹 Asegurar que la sesión no se active incorrectamente
+        usuarioExistente.setSessionActive("0");
+
+        return usuarioRepository.save(usuarioExistente);
+    }
+
+
+
+/*    public Usuario actualizarUsuario(Integer id, Usuario usuarioActualizado) {
+        Usuario usuarioExistente = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Validar si la persona ya existe en la base de datos
+        if (usuarioActualizado.getPersona() != null) {
+            Optional<Persona> personaExistenteOpt = personaRepository.findByIdentificacion(usuarioActualizado.getPersona().getIdentificacion());
+
+            Persona personaExistente;
+            if (personaExistenteOpt.isPresent()) {
+                personaExistente = personaExistenteOpt.get();
+            } else {
+                // Si no existe, guardarla primero en la BD
+                personaExistente = personaRepository.save(usuarioActualizado.getPersona());
+            }
+
+            usuarioExistente.setPersona(personaExistente);
+
+            // 🔹 Generar el correo basado en el nombre y apellido
+            String correoGenerado = generarCorreo(personaExistente.getNombres(), personaExistente.getApellidos());
+
+            // 🔹 Verificar si el correo ya existe y evitar duplicados
+            int contador = 0;
+            String correoFinal = correoGenerado;
+            while (usuarioRepository.existsByMail(correoFinal)) {
+                contador++;
+                correoFinal = correoGenerado.replace("@mail.com", contador + "@mail.com");
+            }
+
+            usuarioExistente.setMail(correoFinal);
+        }
+
+        // Actualizar datos del usuario
+        usuarioExistente.setUsername(usuarioActualizado.getUsername());
+
+        // Mantener la contraseña actual si no se envía una nueva
+        if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().isEmpty()) {
+            usuarioExistente.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));
+        }
+
+        usuarioExistente.setSessionActive(usuarioActualizado.getSessionActive());
+        usuarioExistente.setStatus(usuarioActualizado.getStatus());
+
+        return usuarioRepository.save(usuarioExistente);
+    }*/
+
+    //Logica para eliminar un usuario
+    public boolean eliminarUsuario(Integer id) {
+        Usuario usuario = usuarioRepository.findById(id).orElse(null);
+        if (usuario != null) {
+            usuario.setStatus("INACTIVO"); // Cambiar el estado a INACTIVO
+            usuarioRepository.save(usuario); // Guardar cambios en la BD
+            return true;
+        }
+        return false; // Retorna false si el usuario no existe
+    }
+
+    public List<Usuario> obtenerUsuariosActivos() {
+        return usuarioRepository.findByStatus("ACTIVO"); // Solo listar usuarios activos
+    }
+
+
+
+
+
+
+/*    public Usuario actualizarUsuario(Integer id, Usuario usuarioActualizado) {
+        Usuario usuarioExistente = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Actualizar datos del usuario
+        usuarioExistente.setUsername(usuarioActualizado.getUsername());
+        usuarioExistente.setPassword(usuarioActualizado.getPassword());
+        usuarioExistente.setMail(usuarioActualizado.getMail());
+        usuarioExistente.setSessionActive(usuarioActualizado.getSessionActive());
+        usuarioExistente.setStatus(usuarioActualizado.getStatus());
+
+        // Actualizar persona asociada si no es nula
+        if (usuarioActualizado.getPersona() != null) {
+            usuarioExistente.setPersona(usuarioActualizado.getPersona());
+        }
+
+        return usuarioRepository.save(usuarioExistente);
+    }*/
+
 }

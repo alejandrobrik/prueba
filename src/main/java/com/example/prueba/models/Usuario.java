@@ -1,7 +1,9 @@
 package com.example.prueba.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -58,5 +60,7 @@ public class Usuario {
             throw new RuntimeException("Error al convertir a JSON", e);
         }
     }
+
+
 
 }

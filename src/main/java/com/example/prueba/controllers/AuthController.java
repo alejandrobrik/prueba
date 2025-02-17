@@ -1,6 +1,7 @@
 package com.example.prueba.controllers;
 
 import com.example.prueba.services.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ public class AuthController {
     private AuthService authService;
 
     // 🔹 Endpoint para iniciar sesión
+    @Operation(summary = "Iniciar sesión", description = "Autentica a un usuario con su nombre de usuario o correo y contraseña.")
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
         String usernameOrMail = request.get("usernameOrMail");
@@ -29,6 +31,7 @@ public class AuthController {
     }
 
     // 🔹 Endpoint para cerrar sesión
+    @Operation(summary = "Cerrar sesión", description = "Cierra la sesión de un usuario con su nombre de usuario o correo.")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestBody Map<String, String> request) {
         String usernameOrMail = request.get("usernameOrMail");
@@ -42,6 +45,7 @@ public class AuthController {
     }
 
     // 🔹 Endpoint para registrar usuario (con generación automática de correo)
+    @Operation(summary = "Registrar usuario", description = "Registra un nuevo usuario en el sistema.")
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
         try {

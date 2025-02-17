@@ -8,6 +8,7 @@ import com.example.prueba.repositories.PersonaRepository;
 import com.example.prueba.repositories.RolRepository;
 import com.example.prueba.repositories.SessionLogRepository;
 import com.example.prueba.repositories.UsuarioRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,7 +123,7 @@ public class AuthService {
         return primeraLetra + primerApellido + "@mail.com";
     }
     // Método para autenticación
-    @Transactional
+
     public String login(String usernameOrMail, String password) {
         Optional<Usuario> usuarioOpt = usuarioRepository.findByUsernameOrMail(usernameOrMail, usernameOrMail);
 
