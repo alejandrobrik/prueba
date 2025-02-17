@@ -4,11 +4,17 @@ FROM eclipse-temurin:17-jdk-alpine
 # Establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copia el archivo JAR generado por Gradle al contenedor
-COPY build/libs/prueba-0.0.1-SNAPSHOT.jar app.jar
+# Copia los archivos del proyecto al contenedor
+COPY . .
 
-# Expone el puerto 8080 (o el que uses en tu aplicación)
+# Instala Gradle si no está presente y construye la aplicación
+RUN ./gradlew build --no-daemon
+
+# Copia el archivo JAR generado al contenedor
+RUN cp build/libs/prueba-0.0.1-SNAPSHOT.jar app.jar
+
+# Expone el puerto 8080
 EXPOSE 8080
 
-# Comando para ejecutar la aplicación Spring Boot
+# Ejecutar la aplicación
 CMD ["java", "-jar", "app.jar"]
